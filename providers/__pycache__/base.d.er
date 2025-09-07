@@ -1,0 +1,16 @@
+##[pylyzer] failed /home/shade/Documentos/dev/chatbot/providers/base.py 1757278502 0
+74
+.___v_desugar_1 = pyimport "abc"
+.abc = pyimport "abc"
+.ABC: {abc.ABC}
+.abstractmethod: (global::GenericCallable) -> global::GenericCallable
+.___v_desugar_2 = pyimport "typing"
+.typing = pyimport "typing"
+.List: {Type_v_global_4589: (T: Type, N := Nat) -> {global::List(Never, _: Nat)} | Type_v_global_4589 == List}
+.Dict: {Type_v_global_4591: (D: global::GenericDict) -> {global::Dict(_: global::GenericDict)} | Type_v_global_4591 == Dict}
+.Any: {typing.Any}
+.Provider: ClassType
+.Provider <: abc.ABC
+.Provider.name: Str
+.Provider.chat: (self: base.Provider, messages: global::List!(global::Dict((Str, Str)), _: Nat), **kwargs := Obj) -> Str
+

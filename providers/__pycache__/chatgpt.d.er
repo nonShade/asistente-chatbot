@@ -1,0 +1,17 @@
+##[pylyzer] failed /home/shade/Documentos/dev/chatbot/providers/chatgpt.py 1757278502 0
+4
+.os = pyimport "os"
+
+.___v_desugar_1: Never
+.OpenAI: Never
+.___v_desugar_2 = pyimport "base"
+.base = pyimport "base"
+.Provider: {base.Provider}
+.ChatGPTProvider: ClassType
+.ChatGPTProvider <: base.Provider
+.ChatGPTProvider.model: Never
+.ChatGPTProvider.client: Never
+.ChatGPTProvider.name: Never
+.ChatGPTProvider.__call__: (model: Obj := Obj) -> chatgpt.ChatGPTProvider
+.ChatGPTProvider.chat: (self: chatgpt.ChatGPTProvider, messages: Obj, **kwargs := Obj) -> Never
+

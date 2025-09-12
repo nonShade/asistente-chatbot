@@ -1,0 +1,21 @@
+question,expected_sources,category,difficulty
+"¿Cuáles son los requisitos para matricularse en la UFRO?","info_matricula,reglamento_estudios_2023",matricula,medium
+"¿Cómo puedo apelar una calificación?","manual_apelacion_2024,reglamento_estudios_2023",apelacion,medium
+"¿Qué beneficios estudiantiles están disponibles?","beneficios_estudiantiles",beneficios,easy
+"¿Cuándo son las fechas de matrícula para 2025?","calendario_academico_2025,info_matricula",matricula,easy
+"¿Cuáles son los pasos para titularse?","reglamento_titulacion",titulacion,medium
+"¿Cómo registro actividades académicas?","manual_actividades",actividades,easy
+"¿Qué dice el reglamento sobre evaluaciones?","reglamento_estudios_2023",evaluacion,medium
+"¿Cuándo comienzan las clases en 2025?","calendario_academico_2025",calendario,easy
+"¿Qué requisitos necesito para publicar un libro?","publicacion_libros",publicacion,hard
+"¿Cómo puedo publicar en una revista académica?","publicacion_revistas",publicacion,hard
+"¿Qué hacer si no estoy de acuerdo con una resolución administrativa?","manual_apelacion_2024",apelacion,medium
+"¿Cuáles son las fechas de exámenes?","calendario_academico_2025,reglamento_estudios_2023",calendario,medium
+"¿Qué beneficios hay para estudiantes de escasos recursos?","beneficios_estudiantiles",beneficios,medium
+"¿Cuál es el proceso para cambiar de carrera?","reglamento_estudios_2023,info_matricula",cambio_carrera,hard
+"¿Qué actividades de titulación están permitidas?","reglamento_titulacion",titulacion,medium
+"¿Cómo solicito una beca?","beneficios_estudiantiles",beneficios,easy
+"¿Qué pasa si no cumplo con los requisitos académicos?","reglamento_estudios_2023",rendimiento,hard
+"¿Cuándo son las vacaciones de invierno?","calendario_academico_2025",calendario,easy
+"¿Cómo hago una reclamación sobre servicios estudiantiles?","manual_apelacion_2024",apelacion,medium
+"¿Qué normativa rige las actividades de investigación?","publicacion_libros,publicacion_revistas",investigacion,hard

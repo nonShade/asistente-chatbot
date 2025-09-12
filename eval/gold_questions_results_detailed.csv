@@ -1,0 +1,21 @@
+semantic_similarity,citation_coverage,precision_at_k,has_proper_citations,abstained,abstention_appropriate,tokens_used,latency,cost,provider,question,expected_sources,question_id,category,difficulty
+0.8,0.5,0.2,True,False,False,2622,28.67526626586914,0.00044688,DeepSeek (deepseek-chat),¿Cuáles son los requisitos para matricularse en la UFRO?,"['info_matricula', 'reglamento_estudios_2023']",0,matricula,medium
+0.8,0.0,0.0,True,False,False,1722,14.900898218154907,0.00027691999999999994,DeepSeek (deepseek-chat),¿Cómo puedo apelar una calificación?,"['manual_apelacion_2024', 'reglamento_estudios_2023']",1,apelacion,medium
+0.8,0.0,0.0,True,False,False,2581,38.27633595466614,0.00044422,DeepSeek (deepseek-chat),¿Qué beneficios estudiantiles están disponibles?,['beneficios_estudiantiles'],2,beneficios,easy
+0.8,0.5,0.2,False,True,False,2158,10.017744302749634,0.00032241999999999997,DeepSeek (deepseek-chat),¿Cuándo son las fechas de matrícula para 2025?,"['calendario_academico_2025', 'info_matricula']",3,matricula,easy
+0.8,0.0,0.0,False,False,False,1822,12.278276443481445,0.00028364,DeepSeek (deepseek-chat),¿Cuáles son los pasos para titularse?,['reglamento_titulacion'],4,titulacion,medium
+0.8,0.0,0.0,True,False,False,2128,15.953767776489258,0.0003409,DeepSeek (deepseek-chat),¿Cómo registro actividades académicas?,['manual_actividades'],5,actividades,easy
+0.8,0.0,0.0,True,True,False,1820,12.886245727539062,0.00028728,DeepSeek (deepseek-chat),¿Qué dice el reglamento sobre evaluaciones?,['reglamento_estudios_2023'],6,evaluacion,medium
+0.8,0.0,0.0,True,False,False,1473,13.705371141433716,0.00023939999999999996,DeepSeek (deepseek-chat),¿Cuándo comienzan las clases en 2025?,['calendario_academico_2025'],7,calendario,easy
+0.8,0.0,0.0,False,True,False,1923,11.300761699676514,0.00028896,DeepSeek (deepseek-chat),¿Qué requisitos necesito para publicar un libro?,['publicacion_libros'],8,publicacion,hard
+0.8,0.0,0.0,False,True,False,1811,9.358195543289185,0.00027146,DeepSeek (deepseek-chat),¿Cómo puedo publicar en una revista académica?,['publicacion_revistas'],9,publicacion,hard
+0.8,0.0,0.0,True,False,False,2104,15.342088460922241,0.00033418,DeepSeek (deepseek-chat),¿Qué hacer si no estoy de acuerdo con una resolución administrativa?,['manual_apelacion_2024'],10,apelacion,medium
+0.8,0.0,0.0,True,True,False,1892,9.624144554138184,0.00028545999999999997,DeepSeek (deepseek-chat),¿Cuáles son las fechas de exámenes?,"['calendario_academico_2025', 'reglamento_estudios_2023']",11,calendario,medium
+0.8,0.0,0.0,True,True,False,1919,13.983975887298584,0.00029988,DeepSeek (deepseek-chat),¿Qué beneficios hay para estudiantes de escasos recursos?,['beneficios_estudiantiles'],12,beneficios,medium
+0.8,0.5,0.0,True,False,False,1957,14.640390396118164,0.00030911999999999997,DeepSeek (deepseek-chat),¿Cuál es el proceso para cambiar de carrera?,"['reglamento_estudios_2023', 'info_matricula']",13,cambio_carrera,hard
+0.8,0.0,0.0,True,True,False,2031,13.90815544128418,0.00031696,DeepSeek (deepseek-chat),¿Qué actividades de titulación están permitidas?,['reglamento_titulacion'],14,titulacion,medium
+0.8,0.0,0.0,True,False,False,2184,23.740575551986694,0.00036623999999999994,DeepSeek (deepseek-chat),¿Cómo solicito una beca?,['beneficios_estudiantiles'],15,beneficios,easy
+0.8,0.0,0.0,True,True,False,2265,17.391355276107788,0.00035475999999999997,DeepSeek (deepseek-chat),¿Qué pasa si no cumplo con los requisitos académicos?,['reglamento_estudios_2023'],16,rendimiento,hard
+0.8,0.0,0.0,False,True,False,1799,10.020958662033081,0.00027047999999999997,DeepSeek (deepseek-chat),¿Cuándo son las vacaciones de invierno?,['calendario_academico_2025'],17,calendario,easy
+0.8,0.0,0.0,False,True,False,2064,11.86036992073059,0.00030953999999999997,DeepSeek (deepseek-chat),¿Cómo hago una reclamación sobre servicios estudiantiles?,['manual_apelacion_2024'],18,apelacion,medium
+0.8,0.0,0.0,False,True,False,1851,10.63405990600586,0.00027846,DeepSeek (deepseek-chat),¿Qué normativa rige las actividades de investigación?,"['publicacion_libros', 'publicacion_revistas']",19,investigacion,hard

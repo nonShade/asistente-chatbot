@@ -9,15 +9,12 @@ class DeepSeekProvider(BaseLLMProvider):
 
     PRICING = {
         "deepseek-chat": {"input": 0.00014, "output": 0.00028},  # por 1K tokens
-        "deepseek-reasoner": {"input": 0.00055, "output": 0.0022}
+        "deepseek-reasoner": {"input": 0.00055, "output": 0.0022},
     }
 
     def __init__(self, api_key: str, model: str = "deepseek-chat"):
         super().__init__(api_key, model)
-        self.client = OpenAI(
-            api_key=api_key,
-            base_url="https://api.deepseek.com"
-        )
+        self.client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
     @property
     def name(self) -> str:
@@ -31,8 +28,8 @@ class DeepSeekProvider(BaseLLMProvider):
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                temperature=kwargs.get("temperature", 0.1),
-                max_tokens=kwargs.get("max_tokens", 1500)
+                temperature=kwargs.get("temperature", 0.2),
+                max_tokens=kwargs.get("max_tokens", 1500),
             )
 
             latency = self._measure_latency(start_time)
@@ -49,14 +46,14 @@ class DeepSeekProvider(BaseLLMProvider):
                 "total_tokens": total_tokens,
                 "latency": latency,
                 "cost": cost,
-                "model": self.model
+                "model": self.model,
             }
 
         except Exception as e:
             return {
                 "error": str(e),
                 "latency": self._measure_latency(start_time),
-                "cost": 0.0
+                "cost": 0.0,
             }
 
     def estimate_cost(self, input_tokens: int, output_tokens: int) -> float:

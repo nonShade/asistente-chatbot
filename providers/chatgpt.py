@@ -10,7 +10,7 @@ class ChatGPTProvider(BaseLLMProvider):
     PRICING = {
         "gpt-4": {"input": 0.03, "output": 0.06},  # por 1K tokens
         "gpt-4-turbo": {"input": 0.01, "output": 0.03},
-        "gpt-3.5-turbo": {"input": 0.001, "output": 0.002}
+        "gpt-3.5-turbo": {"input": 0.001, "output": 0.002},
     }
 
     def __init__(self, api_key: str, model: str = "gpt-4"):
@@ -29,8 +29,8 @@ class ChatGPTProvider(BaseLLMProvider):
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                temperature=kwargs.get("temperature", 0.1),
-                max_tokens=kwargs.get("max_tokens", 1500)
+                temperature=kwargs.get("temperature", 0.2),
+                max_tokens=kwargs.get("max_tokens", 1500),
             )
 
             latency = self._measure_latency(start_time)
@@ -47,14 +47,14 @@ class ChatGPTProvider(BaseLLMProvider):
                 "total_tokens": total_tokens,
                 "latency": latency,
                 "cost": cost,
-                "model": self.model
+                "model": self.model,
             }
 
         except Exception as e:
             return {
                 "error": str(e),
                 "latency": self._measure_latency(start_time),
-                "cost": 0.0
+                "cost": 0.0,
             }
 
     def estimate_cost(self, input_tokens: int, output_tokens: int) -> float:

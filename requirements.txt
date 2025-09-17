@@ -14,3 +14,4 @@ gradio>=3.38.0
 beautifulsoup4>=4.12.2
 pyarrow>=11.0.0
 fastparquet>=0.9.0
+google-generativeai>=0.3.0

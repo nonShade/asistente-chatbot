@@ -12,7 +12,7 @@ from typing import Optional
  # Agrega la raíz del proyecto al path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from providers.chatgpt import ChatGPTProvider
+from providers.gemini import GeminiProvider
 from providers.deepseek import DeepSeekProvider
 from rag.embedding_system import EmbeddingSystem
 from rag.rag_system import RAGSystem
@@ -31,15 +31,15 @@ class UFROChatbot:
 
     def setup_providers(self):
         """Inicializa los proveedores de modelos de lenguaje (LLM)."""
-        openai_key = os.getenv('OPENAI_API_KEY')
+        gemini_key = os.getenv('GEMINI_API_KEY')
         deepseek_key = os.getenv('DEEPSEEK_API_KEY')
 
-        if openai_key:
-            openai_model = os.getenv('OPENAI_MODEL', 'gpt-4')
-            self.providers.append(ChatGPTProvider(openai_key, openai_model))
-            print(f"✓ Proveedor ChatGPT inicializado ({openai_model})")
+        if gemini_key:
+            gemini_model = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
+            self.providers.append(GeminiProvider(gemini_key, gemini_model))
+            print(f"✓ Proveedor Gemini inicializado ({gemini_model})")
         else:
-            print("⚠ No se encontró OPENAI_API_KEY")
+            print("⚠ No se encontró GEMINI_API_KEY")
 
         if deepseek_key:
             deepseek_model = os.getenv('DEEPSEEK_MODEL', 'deepseek-chat')
@@ -95,7 +95,7 @@ class UFROChatbot:
         print("Escribe 'salir' para terminar, 'help' para ayuda")
         print("Comandos especiales:")
         print("  /compare <pregunta>  - Comparar respuestas de ambos proveedores")
-        print("  /chatgpt <pregunta>  - Usar solo ChatGPT")
+        print("  /gemini <pregunta>   - Usar solo Gemini")
         print("  /deepseek <pregunta> - Usar solo DeepSeek")
         print("="*60)
 
@@ -121,9 +121,9 @@ class UFROChatbot:
                 if query.startswith('/compare '):
                     query = query[9:]
                     compare_mode = True
-                elif query.startswith('/chatgpt '):
-                    query = query[9:]
-                    provider_name = 'chatgpt'
+                elif query.startswith('/gemini '):
+                    query = query[8:]
+                    provider_name = 'gemini'
                 elif query.startswith('/deepseek '):
                     query = query[10:]
                     provider_name = 'deepseek'
@@ -178,7 +178,7 @@ class UFROChatbot:
         for provider_name, response in provider_responses.items():
             print(f"\n🤖 {provider_name}:")
             print("-" * 30)
-            print(response.answer[:200] + "..." if len(response.answer) > 200 else response.answer)
+            print(response.answer)
             print(f"Tokens: {response.tokens_used} | Latencia: {response.latency:.2f}s | Costo: ${response.cost:.4f}")
 
     def batch_evaluation(self, eval_file: str):

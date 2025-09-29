@@ -168,7 +168,7 @@ class UFROChatbot:
                 if compare_mode:
                     self._handle_compare_mode(query)
                 else:
-                    self._handle_single_query(query, provider_name)
+                    self._handle_single_query(query, provider_name, 5)
 
             except KeyboardInterrupt:
                 print("\n\n¡Hasta luego! 👋")
@@ -184,14 +184,14 @@ class UFROChatbot:
         print("- Las respuestas incluyen citas de las fuentes oficiales")
         print("- Usa comandos especiales para comparar proveedores o elegir uno específico")
 
-    def _handle_single_query(self, query: str, provider_name: Optional[str]):
+    def _handle_single_query(self, query: str, provider_name: Optional[str], k: int = 5):
         """Gestiona una consulta con selección opcional de proveedor."""
         try:
             if self.rag_system is None:
                 print("❌ Sistema RAG no inicializado")
                 return
             
-            responses = self.rag_system.process_query(query, provider_name)
+            responses = self.rag_system.process_query(query, provider_name, k)
             
             if not responses:
                 print("❌ No se obtuvieron respuestas del sistema RAG")
@@ -216,6 +216,15 @@ class UFROChatbot:
             print(f"❌ Error procesando consulta: {str(e)}")
             import traceback
             traceback.print_exc()
+
+    def _handle_direct_query(self, query: str, provider_name: Optional[str], k: int = 5):
+        """Gestiona una consulta directa desde línea de comandos."""
+        print(f"\n🔍 Procesando pregunta: {query}")
+        if provider_name:
+            print(f"🤖 Usando proveedor: {provider_name}")
+        print(f"📄 Recuperando {k} documentos relevantes...")
+        
+        self._handle_single_query(query, provider_name, k)
 
     def _handle_compare_mode(self, query: str):
         """Gestiona la comparación entre proveedores."""
@@ -255,8 +264,13 @@ class UFROChatbot:
 def main():
     """Punto de entrada principal."""
     parser = argparse.ArgumentParser(description='UFRO Chatbot - Asistente de normativa')
+    parser.add_argument('query', nargs='?', help='Pregunta a realizar al chatbot')
     parser.add_argument('--mode', choices=['interactive', 'batch', 'build-index'],
-                       default='interactive', help='Modo de ejecución')
+                       help='Modo de ejecución')
+    parser.add_argument('--provider', choices=['deepseek', 'chatgpt'],
+                       help='Proveedor LLM específico a usar')
+    parser.add_argument('--k', type=int, default=5,
+                       help='Número de documentos a recuperar (default: 5)')
     parser.add_argument('--eval-file', default='eval/gold_questions.csv',
                        help='Archivo de evaluación para modo batch')
 
@@ -264,6 +278,17 @@ def main():
 
     try:
         chatbot = UFROChatbot()
+
+        # Si se proporciona una consulta directa
+        if args.query:
+            chatbot.setup_providers()
+            chatbot.setup_rag_system()
+            chatbot._handle_direct_query(args.query, args.provider, args.k)
+            return
+
+        # Determinar modo por defecto si no se especifica
+        if args.mode is None:
+            args.mode = 'interactive'
 
         if args.mode == 'build-index':
             print("🔨 Construyendo índice FAISS...")

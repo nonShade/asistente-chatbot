@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  ufro-chatbot:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: ufro-chatbot-prod
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEEPSEEK_MODEL=${DEEPSEEK_MODEL:-deepseek-chat}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-all-MiniLM-L6-v2}
+      - CHUNK_SIZE=${CHUNK_SIZE:-900}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-120}
+      - USE_QDRANT=${USE_QDRANT:-true}
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env:ro
+    depends_on:
+      - qdrant
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - ufro-network
+
+  qdrant:
+    image: qdrant/qdrant:v1.7.0
+    container_name: ufro-qdrant-prod
+    restart: always
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - ufro-network
+
+volumes:
+  qdrant_data:
+    driver: local
+
+networks:
+  ufro-network:
+    driver: bridge

@@ -161,10 +161,10 @@ RESPUESTA DETALLADA Y BIEN DOCUMENTADA:"""
         # El modelo es mejor determinando relevancia semántica que un simple score de similitud
         return None
 
-    def process_query(self, query: str, provider_name: Optional[str] = None) -> List[RAGResponse]:
+    def process_query(self, query: str, provider_name: Optional[str] = None, k: int = 5) -> List[RAGResponse]:
         """Procesa consulta a través del pipeline RAG."""
         # Recupera contexto
-        context, sources = self.retrieve_context(query)
+        context, sources = self.retrieve_context(query, k)
 
         # Verifica si debe abstenerse
         abstention = self.should_abstain(sources, query)

@@ -67,6 +67,62 @@ sleep 30
 echo "📊 Estado de los servicios:"
 docker-compose -f docker-compose.prod.yml ps
 
+# Construir índices de documentos
+echo "📚 Construyendo índices de documentos..."
+echo "⏳ Este proceso puede tomar 2-5 minutos..."
+
+# Esperar a que Qdrant esté completamente listo
+echo "⏳ Esperando a que Qdrant esté completamente disponible..."
+for i in {1..30}; do
+    if docker-compose -f docker-compose.prod.yml exec -T qdrant curl -f http://localhost:6333/collections &>/dev/null; then
+        echo "✓ Qdrant está listo"
+        break
+    fi
+    echo "⏳ Esperando Qdrant... ($i/30)"
+    sleep 2
+done
+
+# Construir índices
+echo "🔨 Ejecutando construcción de índices..."
+if docker-compose -f docker-compose.prod.yml exec -T ufro-chatbot python scripts/build_index.py; then
+    echo "✅ Índices construidos exitosamente"
+else
+    echo "❌ Error construyendo índices. Intentando una vez más..."
+    sleep 10
+    docker-compose -f docker-compose.prod.yml exec -T ufro-chatbot python scripts/build_index.py
+fi
+
+# Verificar que los índices se crearon correctamente
+echo "🔍 Verificando que los índices se crearon correctamente..."
+sleep 5
+
+# Verificar colecciones en Qdrant
+echo "🗃️ Verificando colecciones en Qdrant..."
+docker-compose -f docker-compose.prod.yml exec -T qdrant curl -s http://localhost:6333/collections | grep -q "ufro_documents" && echo "✅ Colección ufro_documents encontrada" || echo "❌ Colección ufro_documents no encontrada"
+
+# Verificar desde Python
+docker-compose -f docker-compose.prod.yml exec -T ufro-chatbot python -c "
+import os
+import sys
+sys.path.append('/app')
+try:
+    from rag.qdrant_client import UFROQdrantClient
+    client = UFROQdrantClient()
+    collections = client.client.get_collections()
+    collection_names = [c.name for c in collections.collections]
+    print(f'✓ Colecciones encontradas: {collection_names}')
+    if 'ufro_documents' in collection_names:
+        info = client.client.get_collection('ufro_documents')
+        print(f'✓ Colección ufro_documents: {info.vectors_count} vectores')
+        print('✅ Sistema listo para consultas')
+    else:
+        print('❌ Error: Colección ufro_documents no encontrada')
+        sys.exit(1)
+except Exception as e:
+    print(f'❌ Error verificando índices: {e}')
+    sys.exit(1)
+"
+
 # Verificar logs
 echo "📋 Últimos logs del chatbot:"
 docker-compose -f docker-compose.prod.yml logs --tail=20 ufro-chatbot

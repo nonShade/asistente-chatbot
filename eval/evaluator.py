@@ -1,10 +1,11 @@
 import os
 import time
 import pandas as pd
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 from rag.rag_system import RAGSystem, RAGResponse
+import numpy as np
 
 
 class EvaluationMetrics:
@@ -64,11 +65,57 @@ class EvaluationMetrics:
         citations = re.findall(citation_pattern, answer, re.IGNORECASE)
         return len(citations) >= 1
 
+    def evaluate_response_quality(self, response: RAGResponse, reference_answer: str = "") -> float:
+        """Evalúa la calidad de una respuesta basada en múltiples criterios."""
+        score = 0.0
+        max_score = 1.0
+        
+        # Si hay respuesta de referencia, usar similitud semántica real
+        if reference_answer:
+            semantic_score = self.calculate_semantic_similarity(response.answer, reference_answer)
+            score += semantic_score * 0.4  # 40% del peso para similitud semántica
+        
+        # 1. Longitud y completitud (0.2 puntos máximo)
+        if len(response.answer) < 20:
+            length_score = 0.0
+        elif len(response.answer) < 100:
+            length_score = 0.1
+        else:
+            length_score = 0.2
+        score += length_score
+        
+        # 2. Presencia de información específica (0.2 puntos máximo si no hay referencia, 0.1 si hay)
+        answer_lower = response.answer.lower()
+        specificity_indicators = [
+            'página', 'artículo', 'reglamento', 'requisito', 'proceso',
+            'debe', 'pueden', 'necesita', 'solicitar', 'fecha', 'solicitud',
+            'documentación', 'calendario', 'formulario'
+        ]
+        max_specificity = 0.1 if reference_answer else 0.2
+        specificity_score = min(max_specificity, sum(0.02 for indicator in specificity_indicators if indicator in answer_lower))
+        score += specificity_score
+        
+        # 3. Estructura y coherencia (0.2 puntos máximo)
+        structure_score = 0.0
+        if any(marker in response.answer for marker in [':', '-', '•', '1.', '2.', '3.']):
+            structure_score += 0.1
+        if len([s for s in response.answer.split('.') if len(s.strip()) > 10]) >= 2:
+            structure_score += 0.1
+        score += structure_score
+        
+        # 4. Uso apropiado de fuentes (0.2 puntos máximo)
+        sources_score = 0.0
+        if response.sources:
+            sources_score = min(0.2, len(response.sources) * 0.04)
+        score += sources_score
+        
+        return min(score, max_score)
+
     def evaluate_response(self, response: RAGResponse, expected_answer: str,
                          expected_sources: List[str]) -> Dict[str, Any]:
         """Evalúa una sola respuesta."""
-        # Similitud semántica (ya que no tenemos respuestas exactas esperadas)
-        semantic_score = 0.8 if len(response.answer) > 50 else 0.2  # Placeholder
+        # Evaluación de calidad de respuesta basada en múltiples criterios
+        semantic_score = self.evaluate_response_quality(response, expected_answer)
 
         # Cobertura de citas
         citation_coverage = self.calculate_citation_coverage(response, expected_sources)
@@ -108,8 +155,16 @@ class RAGEvaluator:
         """Carga preguntas de evaluación."""
         return pd.read_csv(eval_file)
 
+    def load_reference_answers(self, ref_file: str) -> Dict[str, str]:
+        """Carga respuestas de referencia si están disponibles."""
+        try:
+            ref_df = pd.read_csv(ref_file)
+            return dict(zip(ref_df['question'], ref_df['reference_answer']))
+        except:
+            return {}
+
     def evaluate_single_question(self, question: str, expected_sources: List[str],
-                                provider_name: str = None) -> Dict[str, Any]:
+                                provider_name: Optional[str] = None) -> Dict[str, Any]:
         """Evalúa sistema RAG en una sola pregunta."""
         start_time = time.time()
 
@@ -135,23 +190,35 @@ class RAGEvaluator:
             'total_latency': time.time() - start_time
         }
 
-    def run_full_evaluation(self, eval_file: str) -> Dict[str, Any]:
+    def run_full_evaluation(self, eval_file: str, reference_file: Optional[str] = None) -> Dict[str, Any]:
         """Ejecuta evaluación en conjunto de pruebas completo."""
         eval_df = self.load_evaluation_set(eval_file)
+        reference_answers = {}
+        if reference_file:
+            reference_answers = self.load_reference_answers(reference_file)
 
         all_results = []
         provider_results = {}
 
         print(f"Ejecutando evaluación en {len(eval_df)} preguntas...")
 
-        for idx, row in eval_df.iterrows():
-            print(f"Evaluando pregunta {idx + 1}/{len(eval_df)}: {row['question'][:50]}...")
+        for i, (idx, row) in enumerate(eval_df.iterrows()):
+            question_text = str(row['question'])
+            print(f"Evaluando pregunta {i + 1}/{len(eval_df)}: {question_text[:50]}...")
 
-            expected_sources = row['expected_sources'].split(',') if row['expected_sources'] else []
+            try:
+                expected_sources_value = row.get('expected_sources', '')
+                if expected_sources_value and str(expected_sources_value) != 'nan':
+                    expected_sources_str = str(expected_sources_value)
+                    expected_sources = [s.strip() for s in expected_sources_str.split(',') if s.strip()]
+                else:
+                    expected_sources = []
+            except:
+                expected_sources = []
 
             # Evalúa con todos los proveedores
             result = self.evaluate_single_question(
-                row['question'],
+                question_text,
                 expected_sources
             )
 
@@ -164,10 +231,14 @@ class RAGEvaluator:
                 if provider not in provider_results:
                     provider_results[provider] = []
 
+                # Busca respuesta de referencia
+                reference_answer = reference_answers.get(question_text, "")
+
                 response_metrics.update({
-                    'question_id': idx,
-                    'category': row['category'],
-                    'difficulty': row['difficulty']
+                    'question_id': i,
+                    'category': str(row.get('category', 'unknown')),
+                    'difficulty': str(row.get('difficulty', 'unknown')),
+                    'has_reference': bool(reference_answer)
                 })
 
                 provider_results[provider].append(response_metrics)

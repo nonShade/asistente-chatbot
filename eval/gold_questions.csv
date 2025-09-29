@@ -1,21 +1,21 @@
 question,expected_sources,category,difficulty
-"¿Cuáles son los requisitos para matricularse en la UFRO?","info_matricula,reglamento_estudios_2023",matricula,medium
-"¿Cómo puedo apelar una calificación?","manual_apelacion_2024,reglamento_estudios_2023",apelacion,medium
-"¿Qué beneficios estudiantiles están disponibles?","beneficios_estudiantiles",beneficios,easy
-"¿Cuándo son las fechas de matrícula para 2025?","calendario_academico_2025,info_matricula",matricula,easy
-"¿Cuáles son los pasos para titularse?","reglamento_titulacion",titulacion,medium
-"¿Cómo registro actividades académicas?","manual_actividades",actividades,easy
-"¿Qué dice el reglamento sobre evaluaciones?","reglamento_estudios_2023",evaluacion,medium
-"¿Cuándo comienzan las clases en 2025?","calendario_academico_2025",calendario,easy
-"¿Qué requisitos necesito para publicar un libro?","publicacion_libros",publicacion,hard
-"¿Cómo puedo publicar en una revista académica?","publicacion_revistas",publicacion,hard
-"¿Qué hacer si no estoy de acuerdo con una resolución administrativa?","manual_apelacion_2024",apelacion,medium
-"¿Cuáles son las fechas de exámenes?","calendario_academico_2025,reglamento_estudios_2023",calendario,medium
-"¿Qué beneficios hay para estudiantes de escasos recursos?","beneficios_estudiantiles",beneficios,medium
-"¿Cuál es el proceso para cambiar de carrera?","reglamento_estudios_2023,info_matricula",cambio_carrera,hard
-"¿Qué actividades de titulación están permitidas?","reglamento_titulacion",titulacion,medium
-"¿Cómo solicito una beca?","beneficios_estudiantiles",beneficios,easy
-"¿Qué pasa si no cumplo con los requisitos académicos?","reglamento_estudios_2023",rendimiento,hard
-"¿Cuándo son las vacaciones de invierno?","calendario_academico_2025",calendario,easy
-"¿Cómo hago una reclamación sobre servicios estudiantiles?","manual_apelacion_2024",apelacion,medium
-"¿Qué normativa rige las actividades de investigación?","publicacion_libros,publicacion_revistas",investigacion,hard
+"¿Cuáles son los requisitos para matricularse en la UFRO?","INFO-matricula.pdf,01-Reglamento-de-Regimen-de-Estudios-2023.pdf",matricula,medium
+"¿Cómo puedo apelar una calificación?","manual_del_estudiante_apelacion_2024.pdf,01-Reglamento-de-Regimen-de-Estudios-2023.pdf",apelacion,medium
+"¿Qué beneficios estudiantiles están disponibles?","Preguntas-frecuentes-beneficios-estudiantiles.pdf",beneficios,easy
+"¿Cuáles son los pasos para titularse?","Reglamento_actividad_titulacion.pdf",titulacion,medium
+"¿Qué dice el reglamento sobre evaluaciones?","01-Reglamento-de-Regimen-de-Estudios-2023.pdf",evaluacion,medium
+"¿Qué hacer si no estoy de acuerdo con una resolución administrativa?","manual_del_estudiante_apelacion_2024.pdf",apelacion,medium
+"¿Qué beneficios hay para estudiantes de escasos recursos?","Preguntas-frecuentes-beneficios-estudiantiles.pdf",beneficios,medium
+"¿Cuál es el proceso para cambiar de carrera?","01-Reglamento-de-Regimen-de-Estudios-2023.pdf,02-Res-Ex-3542-2022-Reglamento-de-Admision-para-carreras-de-Pregrado.pdf",cambio_carrera,hard
+"¿Qué actividades de titulación están permitidas?","Reglamento_actividad_titulacion.pdf",titulacion,medium
+"¿Cómo solicito una beca?","Preguntas-frecuentes-beneficios-estudiantiles.pdf",beneficios,easy
+"¿Qué pasa si no cumplo con los requisitos académicos?","01-Reglamento-de-Regimen-de-Estudios-2023.pdf",rendimiento,hard
+"¿Cómo hago una reclamación sobre servicios estudiantiles?","manual_del_estudiante_apelacion_2024.pdf",apelacion,medium
+"¿Cuáles son las obligaciones financieras de los estudiantes?","03-resex-2022326308-obligaciones-financieras.pdf",financiero,medium
+"¿Qué dice el reglamento de convivencia?","04-Reglamento-Convivencia-rex.pdf",convivencia,medium
+"¿Cuáles son los requisitos de admisión?","02-Res-Ex-3542-2022-Reglamento-de-Admision-para-carreras-de-Pregrado.pdf",admision,medium
+"¿Qué información necesito para la matrícula?","INFO-matricula.pdf",matricula,easy
+"¿Cómo funciona el régimen de estudios?","01-Reglamento-de-Regimen-de-Estudios-2023.pdf",estudios,medium
+"¿Qué resoluciones rigen las actividades académicas?","Res. Ex. 3332.pdf,Res.3280 Ex 418.pdf",academico,hard
+"¿Cuál es el proceso de apelación estudiantil?","manual_del_estudiante_apelacion_2024.pdf",apelacion,easy
+"¿Qué tipos de actividades de titulación existen?","Reglamento_actividad_titulacion.pdf",titulacion,easy

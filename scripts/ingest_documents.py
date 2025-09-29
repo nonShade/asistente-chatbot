@@ -25,11 +25,13 @@ class DocumentIngester:
         self.chunk_overlap = chunk_overlap
 
     def extract_text_from_file(self, file_path: str) -> List[Tuple[str, int]]:
-        """Extrae texto de un archivo, soporta PDF y TXT."""
+        """Extrae texto de un archivo, soporta PDF, TXT y MD."""
         if file_path.lower().endswith('.pdf'):
             return self.extract_text_from_pdf(file_path)
         elif file_path.lower().endswith('.txt'):
             return self.extract_text_from_txt(file_path)
+        elif file_path.lower().endswith('.md'):
+            return self.extract_text_from_markdown(file_path)
         else:
             print(f"Formato de archivo no soportado: {file_path}")
             return []
@@ -54,6 +56,54 @@ class DocumentIngester:
         except Exception as e:
             print(f"Error procesando {txt_path}: {str(e)}")
             return []
+
+    def extract_text_from_markdown(self, md_path: str) -> List[Tuple[str, int]]:
+        """Extrae texto de un archivo Markdown, dividiendo por chunks marcados."""
+        try:
+            with open(md_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+            
+            # Dividir por chunks marcados (## Chunk X) o por secciones (###)
+            chunk_pattern = r'## Chunk \d+'
+            if re.search(chunk_pattern, content):
+                # Si hay chunks marcados, usar esos como separadores
+                sections = re.split(chunk_pattern, content)
+            else:
+                # Si no hay chunks, dividir por secciones de nivel 3 (###)
+                sections = re.split(r'###', content)
+            
+            pages_text = []
+            
+            for page_num, section in enumerate(sections, 1):
+                if section.strip():
+                    # Limpiar markdown básico pero preservar estructura
+                    cleaned_text = self._clean_markdown_text(section)
+                    if cleaned_text.strip():
+                        pages_text.append((cleaned_text, page_num))
+            
+            return pages_text
+            
+        except Exception as e:
+            print(f"Error procesando {md_path}: {str(e)}")
+            return []
+
+    def _clean_markdown_text(self, text: str) -> str:
+        """Limpia texto Markdown preservando información relevante."""
+        # Convertir headers a texto plano manteniendo jerarquía
+        text = re.sub(r'#{1,6}\s*', '', text)
+        
+        # Limpiar enlaces pero mantener el texto
+        text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
+        
+        # Limpiar markdown de listas
+        text = re.sub(r'^\s*[-*+]\s+', '• ', text, flags=re.MULTILINE)
+        
+        # Normalizar espacios y saltos de línea
+        text = re.sub(r'\n\s*\n', '\n\n', text)
+        text = re.sub(r' +', ' ', text)
+        
+        # Aplicar limpieza general
+        return self._clean_text(text)
 
     def extract_text_from_pdf(self, pdf_path: str) -> List[Tuple[str, int]]:
         """Extrae texto de un PDF, retornando tuplas (texto, número de página)."""

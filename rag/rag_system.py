@@ -5,6 +5,12 @@ from scripts.ingest_documents import DocumentChunk
 from rag.embedding_system import EmbeddingSystem
 from providers.base import BaseLLMProvider
 
+try:
+    from rag.qdrant_client import UFROQdrantClient
+    QDRANT_AVAILABLE = True
+except ImportError:
+    QDRANT_AVAILABLE = False
+
 
 @dataclass
 class RAGResponse:
@@ -19,26 +25,44 @@ class RAGResponse:
 class RAGSystem:
     """Sistema RAG completo para asistente de normativa UFRO."""
 
-    SYSTEM_PROMPT = """Eres un asistente especializado en normativa y reglamentos de la Universidad de La Frontera (UFRO).
+    SYSTEM_PROMPT = """Eres un asistente especializado en normativa universitaria de la Universidad de La Frontera (UFRO). Tu objetivo es proporcionar respuestas precisas, completas y bien estructuradas.
 
-INSTRUCCIONES IMPORTANTES:
-1. Analiza cuidadosamente toda la información proporcionada en el contexto
-2. Si encuentras información relevante que responda a la pregunta, úsala y cita tus fuentes con el formato: [Nombre del documento, página X]
-3. Si la información del contexto es parcialmente relevante pero no responde completamente la pregunta, proporciona lo que puedas basándote en el contexto y menciona qué información específica no está disponible
-4. SOLO si absolutamente NINGUNA información del contexto es relevante para la pregunta, responde: "No encontré información sobre esto en la normativa UFRO disponible. Te sugiero contactar a [oficina correspondiente]"
-5. Sé preciso y cita todas las fuentes relevantes
-6. Usa un tono formal pero amigable
-7. Si hay información contradictoria, menciona ambas fuentes y sus diferencias
-8. Incluso si el contexto parece tangencialmente relacionado, trata de extraer cualquier información útil
+INSTRUCCIONES ESPECÍFICAS:
+1. ANALIZA cuidadosamente toda la información del contexto antes de responder
+2. PROPORCIONA respuestas detalladas con información específica (fechas, requisitos, procesos paso a paso)
+3. ESTRUCTURA tu respuesta usando viñetas o numeración cuando sea apropiado
+4. CITA siempre las fuentes exactas usando el formato: [Nombre del documento, página X]
+5. Si hay múltiples aspectos en la pregunta, abórdalos todos sistemáticamente
 
-CONTEXTO DE NORMATIVA UFRO:
+FORMATO DE RESPUESTA REQUERIDO:
+- Respuesta completa y detallada (mínimo 100 palabras para preguntas complejas)
+- Información específica extraída directamente del contexto
+- Citas correctas al final de cada punto relevante
+- Estructura clara con párrafos o listas según corresponda
+
+MANEJO DE CASOS ESPECIALES:
+- Si la información está parcialmente disponible: proporciona lo que tienes y especifica qué falta
+- Si no hay información relevante: indica claramente que no se encontró información específica
+- Para procesos complejos: explica paso a paso con todos los detalles disponibles
+
+CONTEXTO DE DOCUMENTOS UFRO:
 {context}
 
-PREGUNTA: {question}"""
+PREGUNTA DEL USUARIO: {question}
 
-    def __init__(self, embedding_system: EmbeddingSystem, providers: List[BaseLLMProvider]):
+RESPUESTA DETALLADA Y BIEN DOCUMENTADA:"""
+
+    def __init__(self, embedding_system: EmbeddingSystem, providers: List[BaseLLMProvider], 
+                 use_qdrant: bool = False, qdrant_client=None):
         self.embedding_system = embedding_system
         self.providers = providers
+        self.use_qdrant = use_qdrant and QDRANT_AVAILABLE
+        self.qdrant_client = qdrant_client
+        
+        if use_qdrant and not QDRANT_AVAILABLE:
+            print("⚠️ Qdrant no disponible, usando FAISS")
+        elif use_qdrant and qdrant_client is None:
+            print("⚠️ Cliente Qdrant no proporcionado, usando FAISS")
 
     def rewrite_query(self, query: str) -> str:
         """Reescribe la consulta para mejor recuperación (mejora opcional)."""
@@ -60,33 +84,58 @@ PREGUNTA: {question}"""
 
         return enhanced
 
-    def retrieve_context(self, query: str, k: int = 8) -> Tuple[str, List[Dict[str, Any]]]:
+    def retrieve_context(self, query: str, k: int = 5) -> Tuple[str, List[Dict[str, Any]]]:
         """Recupera contexto relevante e información de fuentes con mejor cobertura."""
         # Mejora la consulta
         enhanced_query = self.rewrite_query(query)
 
-        # Busca chunks relevantes con k más alto para mejor cobertura
-        results = self.embedding_system.search(enhanced_query, k=k)
+        if self.use_qdrant and self.qdrant_client:
+            # Usar Qdrant para búsqueda
+            query_embedding = self.embedding_system.embed_texts([enhanced_query])[0]
+            results = self.qdrant_client.search_similar(query_embedding, limit=k)
+            
+            if not results:
+                return "", []
+            
+            # Construye contexto y fuentes para Qdrant
+            context_parts = []
+            sources = []
+            
+            for result in results:
+                context_parts.append(f"[{result['title']}, página {result['page']}]: {result['text']}")
+                
+                sources.append({
+                    'title': result['title'],
+                    'page': result['page'],
+                    'content': result['text'][:300] + "...",
+                    'doc_id': result['doc_id'],
+                    'score': result['score'],
+                    'url': result['url'],
+                    'vigencia': result['vigencia']
+                })
+        else:
+            # Usar FAISS para búsqueda (comportamiento original)
+            results = self.embedding_system.search(enhanced_query, k=k)
 
-        if not results:
-            return "", []
+            if not results:
+                return "", []
 
-        # Construye contexto y fuentes
-        context_parts = []
-        sources = []
+            # Construye contexto y fuentes para FAISS
+            context_parts = []
+            sources = []
 
-        for chunk, score in results:
-            context_parts.append(f"[{chunk.title}, página {chunk.page}]: {chunk.content}")
+            for chunk, score in results:
+                context_parts.append(f"[{chunk.title}, página {chunk.page}]: {chunk.content}")
 
-            sources.append({
-                'title': chunk.title,
-                'page': chunk.page,
-                'content': chunk.content[:300] + "...",  # Más contexto
-                'doc_id': chunk.doc_id,
-                'score': score,
-                'url': chunk.url,
-                'vigencia': chunk.vigencia
-            })
+                sources.append({
+                    'title': chunk.title,
+                    'page': chunk.page,
+                    'content': chunk.content[:300] + "...",
+                    'doc_id': chunk.doc_id,
+                    'score': score,
+                    'url': chunk.url,
+                    'vigencia': chunk.vigencia
+                })
 
         context = "\n\n".join(context_parts)
         return context, sources
@@ -100,7 +149,7 @@ PREGUNTA: {question}"""
             {"role": "user", "content": prompt}
         ]
 
-        return provider.chat(messages, temperature=0.1, max_tokens=1500)
+        return provider.chat(messages, temperature=0.3, max_tokens=1200)
 
     def should_abstain(self, sources: List[Dict[str, Any]], query: str) -> Optional[str]:
         """Determina si el sistema debe abstenerse debido a la falta completa de fuentes."""
@@ -137,20 +186,26 @@ PREGUNTA: {question}"""
             providers_to_use = [p for p in self.providers if provider_name.lower() in p.name.lower()]
 
         for provider in providers_to_use:
-            result = self.generate_response(query, context, provider)
+            try:
+                result = self.generate_response(query, context, provider)
+                
+                if 'error' in result:
+                    print(f"❌ Error en {provider.name}: {result['error']}")
+                    continue
 
-            if 'error' in result:
+                response = RAGResponse(
+                    answer=result['response'],
+                    sources=sources,
+                    provider_name=provider.name,
+                    tokens_used=result.get('total_tokens', 0),
+                    latency=result.get('latency', 0.0),
+                    cost=result.get('cost', 0.0)
+                )
+                responses.append(response)
+                
+            except Exception as e:
+                print(f"❌ Error inesperado con {provider.name}: {str(e)}")
                 continue
-
-            response = RAGResponse(
-                answer=result['response'],
-                sources=sources,
-                provider_name=provider.name,
-                tokens_used=result.get('total_tokens', 0),
-                latency=result.get('latency', 0.0),
-                cost=result.get('cost', 0.0)
-            )
-            responses.append(response)
 
         return responses
 

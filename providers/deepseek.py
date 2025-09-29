@@ -28,7 +28,7 @@ class DeepSeekProvider(BaseLLMProvider):
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                temperature=kwargs.get("temperature", 0.2),
+                temperature=kwargs.get("temperature", 0.3),
                 max_tokens=kwargs.get("max_tokens", 1500),
             )
 

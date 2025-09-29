@@ -15,7 +15,10 @@ class ChatGPTProvider(BaseLLMProvider):
 
     def __init__(self, api_key: str, model: str = "gpt-4"):
         super().__init__(api_key, model)
-        self.client = OpenAI(api_key=api_key)
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://openrouter.ai/api/v1"
+        )
 
     @property
     def name(self) -> str:

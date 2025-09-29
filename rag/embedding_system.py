@@ -8,10 +8,11 @@ from scripts.ingest_documents import DocumentChunk
 
 
 class EmbeddingSystem:
-    """Maneja embeddings de documentos y operaciones del índice FAISS."""
+    """Maneja embeddings de documentos y operaciones del índice FAISS/Qdrant."""
 
-    def __init__(self, model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"):
+    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
         self.model_name = model_name
+        print(f"Inicializando modelo de embeddings: {model_name}")
         self.model = SentenceTransformer(model_name)
         self.index = None
         self.chunks = []
@@ -39,10 +40,11 @@ class EmbeddingSystem:
         index = faiss.IndexFlatIP(dimension)
 
         # Normaliza embeddings para similitud coseno
-        faiss.normalize_L2(embeddings)
+        normalized_embeddings = embeddings.copy()
+        faiss.normalize_L2(normalized_embeddings)
 
         # Agrega embeddings al índice
-        index.add(embeddings.astype('float32'))
+        index.add(normalized_embeddings.astype('float32'))
 
         print(f"Índice FAISS construido con {index.ntotal} vectores")
         return index
@@ -79,13 +81,13 @@ class EmbeddingSystem:
         self.chunks = []
         for _, row in chunks_df.iterrows():
             chunk = DocumentChunk(
-                doc_id=row['doc_id'],
-                title=row['title'],
-                content=row['content'],
-                page=row['page'],
-                chunk_id=row['chunk_id'],
-                url=row['url'],
-                vigencia=row['vigencia']
+                doc_id=str(row['doc_id']),
+                title=str(row['title']),
+                content=str(row['content']),
+                page=int(row['page']),
+                chunk_id=str(row['chunk_id']),
+                url=str(row['url']),
+                vigencia=str(row['vigencia'])
             )
             self.chunks.append(chunk)
 
@@ -100,10 +102,11 @@ class EmbeddingSystem:
         query_embedding = self.model.encode([query], convert_to_numpy=True)
 
         # Normaliza para similitud coseno
-        faiss.normalize_L2(query_embedding)
+        normalized_query = query_embedding.copy()
+        faiss.normalize_L2(normalized_query)
 
         # Busca
-        scores, indices = self.index.search(query_embedding.astype('float32'), k)
+        scores, indices = self.index.search(normalized_query.astype('float32'), k)
 
         # Retorna resultados con chunks y scores
         results = []
@@ -112,6 +115,16 @@ class EmbeddingSystem:
                 results.append((self.chunks[idx], float(score)))
 
         return results
+
+    def embed_texts(self, texts: List[str]) -> np.ndarray:
+        """Genera embeddings para una lista de textos."""
+        embeddings = self.model.encode(
+            texts,
+            batch_size=32,
+            show_progress_bar=True,
+            convert_to_numpy=True
+        )
+        return embeddings
 
     def build_and_save_index(self, chunks: List[DocumentChunk],
                            index_path: str, chunks_path: str):

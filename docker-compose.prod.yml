@@ -1,6 +1,6 @@
 services:
   ufro-chatbot:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile.prod
     container_name: ufro-chatbot-prod
@@ -31,7 +31,7 @@ services:
     networks:
       - ufro-network
     # Limitar memoria para instancias pequeñas
-    mem_limit: 512m
+    mem_limit: 768m
     memswap_limit: 1g
 
   qdrant:

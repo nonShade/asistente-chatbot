@@ -1,0 +1,36 @@
+FROM python:3.10-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies and clean up in single layer
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Copy requirements for production
+COPY requirements-prod.txt requirements.txt
+
+# Install Python dependencies with optimizations for smaller images
+RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt \
+    && pip cache purge
+
+# Copy application code
+COPY . .
+
+# Create data directories
+RUN mkdir -p data/raw data/processed
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+
+# Expose port for Flask application
+EXPOSE 5000
+
+# Default command (can be overridden)
+CMD ["python", "flask_app.py"]

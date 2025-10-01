@@ -2,7 +2,7 @@ services:
   ufro-chatbot:
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     container_name: ufro-chatbot-prod
     restart: always
     ports:
@@ -26,10 +26,13 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "5m"
+        max-file: "2"
     networks:
       - ufro-network
+    # Limitar memoria para instancias pequeñas
+    mem_limit: 512m
+    memswap_limit: 1g
 
   qdrant:
     image: qdrant/qdrant:v1.7.0
@@ -45,10 +48,13 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "5m"
+        max-file: "2"
     networks:
       - ufro-network
+    # Limitar memoria para instancias pequeñas
+    mem_limit: 256m
+    memswap_limit: 512m
 
 volumes:
   qdrant_data:

@@ -135,7 +135,7 @@ def main():
     print("  - data/processed/index.faiss")
     print("  - data/processed/chunks.parquet")
     if use_qdrant and QDRANT_AVAILABLE:
-        print("  - Colección en Qdrant: ufro_regulations")
+         print("  - Colección en Qdrant: ufro_documents")
     print("\n🚀 Sistema listo para usar!")
 
 if __name__ == "__main__":

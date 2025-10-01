@@ -53,7 +53,7 @@ chmod +x deploy-aws.sh
 
 Una vez completado el despliegue, entrar a la aplicacion web mediante el link de flask que dara el docker-compose luego de que se ejecute completamente el script
 
-### Comandos especiales en el chat
+### Comandos especiales en el chat (desarrollo)
 - `/compare <pregunta>` - Comparar respuestas de ambos proveedores
 - `/deepseek <pregunta>` - Usar solo DeepSeek
 - `/chatgpt <pregunta>` - Usar solo ChatGPT
@@ -71,8 +71,8 @@ DEEPSEEK_MODEL=deepseek-chat
 OPENAI_API_KEY=tu_openai_api_key_aqui  
 OPENAI_MODEL=openai/gpt-4o-mini
 
-# Configuración RAG
-EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+# Configuración RAG (embedding_model limitado debido a los recursos de la instancia)
+EMBEDDING_MODEL=all-MiniLM-L6-v2
 CHUNK_SIZE=1200
 CHUNK_OVERLAP=250
 
@@ -109,6 +109,47 @@ QDRANT_PORT=6333
 - **DeepSeek**: ~$0.14 por 1M tokens de entrada, ~$0.28 por 1M tokens de salida
 - **OpenAI GPT-4o-mini**: ~$0.15 por 1M tokens de entrada, ~$0.60 por 1M tokens de salida
 - **Embeddings**: Procesamiento local sin costo adicional
+
+## 🛡️ Ética y Responsabilidad
+
+### Política de Abstención
+Este sistema de chatbot tiene las siguientes limitaciones éticas explícitas:
+
+- **No proporciona asesoría legal vinculante**: Las respuestas son informativas y no constituyen asesoría oficial
+- **No reemplaza consultas oficiales**: Para decisiones académicas importantes, consultar directamente con las oficinas correspondientes de la UFRO
+- **No interpreta casos específicos**: El sistema no debe usarse para resolver situaciones académicas particulares que requieran evaluación humana
+- **Se abstiene de**: Dar consejos sobre procedimientos disciplinarios activos, interpretaciones legales específicas, o decisiones que afecten el estatus académico del estudiante
+
+### Vigencia Normativa
+- **Documentos base**: Todos los documentos incluidos corresponden a versiones oficiales vigentes al momento de la indexación
+- **Responsabilidad de actualización**: Es responsabilidad del usuario verificar la vigencia actual de la normativa antes de tomar decisiones
+- **Advertencia temporal**: La información puede haber sido actualizada después de la última indexación del sistema
+
+### Privacidad
+- **No almacenamiento de consultas**: Las conversaciones no se almacenan permanentemente en el sistema
+- **Datos temporales**: Solo se mantienen datos en memoria durante la sesión activa
+- **APIs externas**: Las consultas se procesan a través de APIs de terceros (OpenAI/DeepSeek) sujetas a sus políticas de privacidad
+- **Recomendación**: Evitar compartir información personal identificable en las consultas
+
+## 📋 Tabla de Trazabilidad de Documentos
+
+| doc_id | Título | Archivo | URL Oficial | Vigencia | Estado |
+|--------|--------|---------|-------------|----------|---------|
+| `reglamento_estudios` | Reglamento de Régimen de Estudios 2023 | 01-Reglamento-de-Regimen-de-Estudios-2023.pdf | [UFRO Normativa](https://www.ufro.cl/normativa/) | 2023 | Vigente |
+| `reglamento_admision` | Reglamento de Admisión para Carreras de Pregrado | 02-Res-Ex-3542-2022-Reglamento-de-Admision-para-carreras-de-Pregrado.pdf | [UFRO Normativa](https://www.ufro.cl/normativa/) | 2022 | Vigente |
+| `obligaciones_financieras` | Obligaciones Financieras | 03-resex-2022326308-obligaciones-financieras.pdf | [UFRO Normativa](https://www.ufro.cl/normativa/) | 2022 | Vigente |
+| `reglamento_convivencia` | Reglamento de Convivencia | 04-Reglamento-Convivencia-rex.pdf | [UFRO Normativa](https://www.ufro.cl/normativa/) | 2023 | Vigente |
+| `info_matricula` | Información de Matrícula | INFO-matricula.pdf | [UFRO Estudiantes](https://www.ufro.cl/estudiantes/) | 2024 | Vigente |
+| `manual_apelacion` | Manual del Estudiante Apelación 2024 | manual_del_estudiante_apelacion_2024.pdf | [UFRO Estudiantes](https://www.ufro.cl/estudiantes/) | 2024 | Vigente |
+| `beneficios_estudiantiles` | Preguntas Frecuentes Beneficios Estudiantiles | Preguntas-frecuentes-beneficios-estudiantiles.pdf | [UFRO Estudiantes](https://www.ufro.cl/estudiantes/) | 2024 | Vigente |
+| `reglamento_titulacion` | Reglamento de Actividad de Titulación | Reglamento_actividad_titulacion.pdf | [UFRO Normativa](https://www.ufro.cl/normativa/) | 2023 | Vigente |
+| `res_3332` | Resolución Ex. 3332 | Res. Ex. 3332.pdf | [UFRO Normativa](https://www.ufro.cl/normativa/) | 2023 | Vigente |
+
+### Notas sobre Trazabilidad
+- **doc_id**: Identificador único utilizado internamente por el sistema RAG
+- **URL Oficial**: Enlaces a las secciones oficiales donde se publican las versiones actualizadas
+- **Vigencia**: Año de la versión incluida en el sistema
+- **Verificación**: Se recomienda verificar la vigencia en el sitio oficial antes de tomar decisiones importantes
 
 ## 📚 Fuentes
 
@@ -147,7 +188,10 @@ El sistema está entrenado con los siguientes documentos oficiales de la UFRO:
    - Normativas específicas adicionales
    - Actualizaciones reglamentarias
 
-### Responsabilidad
+### Responsabilidad Extendida
+- **Verificación obligatoria**: Para decisiones académicas, administrativas o financieras importantes, verificar siempre con fuentes oficiales actualizadas
+- **Limitaciones del sistema**: Este chatbot es una herramienta de consulta inicial, no un sistema de gestión académica oficial
+- **Escalamiento necesario**: Casos complejos o específicos deben escalarse a las oficinas competentes de la UFRO
+- **Actualización de documentos**: La universidad puede actualizar la normativa sin previo aviso; el sistema refleja el estado al momento de la última indexación
 - **Información oficial**: Siempre consultar documentos oficiales para decisiones importantes
-- **Actualización**: Los documentos corresponden a versiones específicas y pueden haber cambiado
 - **Interpretación**: Este sistema es una herramienta de consulta, no un asesor oficial

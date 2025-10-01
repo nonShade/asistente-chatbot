@@ -2,7 +2,7 @@
 
 Sistema de chatbot inteligente que utiliza tecnología RAG (Retrieval-Augmented Generation) para consultar la normativa de la Universidad de La Frontera (UFRO).
 
-## 🚀 Uso
+## 🚀 Uso (desarrollo)
 
 ### Instalación
 ```bash
@@ -10,19 +10,48 @@ git clone <repository-url>
 cd asistente-chatbot
 cp .env.example .env
 # Editar .env con tus API keys
-./setup.sh
+pip install -r requirements.txt
 ```
 
 ### Ejecutar el chatbot
 ```bash
-# Opción 1: Script de conveniencia
-./activate.sh
-python app.py
+# Iniciar Qdrant con Docker
+docker-compose up -d
 
-# Opción 2: Manual
-source .venv/bin/activate
+# Ejecutar el chatbot
+python app.py
+ 
+# O con variables específicas
 USE_QDRANT=true QDRANT_HOST=localhost python app.py
 ```
+
+## 🚀 Uso (produccion o instancia aws)
+### Instalación
+```bash
+git clone <repository-url>
+cd asistente-chatbot
+cp .env.example .env
+# Editar .env con tus API keys
+```
+
+### Ejecutar script de despliegue
+```bash
+chmod +x deploy-aws.sh
+
+# Ejecutar script
+./deploy-aws.sh
+```
+### El script automatiza:
+
+1. Instalación de dependencias: Docker y Docker Compose
+2. Configuración de entorno: Verificación y creación del archivo .env
+3. Construcción de servicios: Chatbot y base de datos vectorial Qdrant
+4. Indexación de documentos: Procesamiento automático de PDFs en /data/raw/
+5. Verificación de salud: Comprobación de servicios y índices
+
+### Acceso a la aplicación
+
+Una vez completado el despliegue, entrar a la aplicacion web mediante el link de flask que dara el docker-compose luego de que se ejecute completamente el script
 
 ### Comandos especiales en el chat
 - `/compare <pregunta>` - Comparar respuestas de ambos proveedores
